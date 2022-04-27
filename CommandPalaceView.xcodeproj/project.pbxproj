@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E706F6A528192E3F00B2F883 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E706F6A328192E3F00B2F883 /* README.md */; };
-		E706F6A628192E3F00B2F883 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E706F6A328192E3F00B2F883 /* README.md */; };
-		E706F6A728192E3F00B2F883 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E706F6A428192E3F00B2F883 /* LICENSE */; };
-		E706F6A828192E3F00B2F883 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = E706F6A428192E3F00B2F883 /* LICENSE */; };
 		E72DF3152818E04200753084 /* PrewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72DF3052818E03E00753084 /* PrewApp.swift */; };
 		E72DF3162818E04200753084 /* PrewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72DF3052818E03E00753084 /* PrewApp.swift */; };
 		E72DF3172818E04200753084 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72DF3062818E03E00753084 /* ContentView.swift */; };
@@ -20,8 +16,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E706F6A328192E3F00B2F883 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		E706F6A428192E3F00B2F883 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		E72DF3052818E03E00753084 /* PrewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrewApp.swift; sourceTree = "<group>"; };
 		E72DF3062818E03E00753084 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E72DF3072818E04200753084 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,8 +45,6 @@
 		E72DF2FF2818E03D00753084 = {
 			isa = PBXGroup;
 			children = (
-				E706F6A428192E3F00B2F883 /* LICENSE */,
-				E706F6A328192E3F00B2F883 /* README.md */,
 				E72DF3042818E03E00753084 /* Shared */,
 				E72DF3132818E04200753084 /* macOS */,
 				E72DF30D2818E04200753084 /* Products */,
@@ -165,8 +157,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E706F6A728192E3F00B2F883 /* LICENSE in Resources */,
-				E706F6A528192E3F00B2F883 /* README.md in Resources */,
 				E72DF3192818E04200753084 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,8 +165,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E706F6A828192E3F00B2F883 /* LICENSE in Resources */,
-				E706F6A628192E3F00B2F883 /* README.md in Resources */,
 				E72DF31A2818E04200753084 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

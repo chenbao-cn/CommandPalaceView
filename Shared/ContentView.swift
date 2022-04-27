@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-// some local changes
+
 struct ContentView: View {
     var body: some View {
         ZStack {
@@ -28,15 +28,33 @@ struct CommandPalace: View {
     @State private
     var text = ""
 
+    @FocusState
+    var searchBarFocus: Bool
+
+    @State private
+    var items: [hehe] = (0 ... 1000).map {
+        hehe(id: $0, str: "Command \($0)")
+    }
+
+    @State private
+    var selecting: hehe? = nil
+
     var body: some View {
         HStack {
             VStack(spacing: 0) { // CommandPalace background
                 VStack(alignment: .leading) { // CommandPalace
                     TextField("title", text: $text) // SearchBar
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+//                        .textFieldStyle(RoundedBorderTextFieldStyle()) // 设置了 textFieldStyle 后，TextField 的字体就没法调整大小了。。。
+                        .font(.largeTitle)
+                        .focused($searchBarFocus)
+
+                        .task {
+                            searchBarFocus = true
+                        }
+
                     // Items
                     ScrollView(.vertical, showsIndicators: false) {
-                        Items
+                        ItemsView
                             .lineLimit(1)
                             .truncationMode(Text.TruncationMode.tail)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,6 +72,10 @@ struct CommandPalace: View {
         }
         // 充满整个 View 并确保  .frame(alignment: .top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(
+            Color.black.opacity(0.1)
+                .onTapGesture { }
+        )
     }
 
     var CommandPalaceFont: Font? {
@@ -65,11 +87,40 @@ struct CommandPalace: View {
     }
 
     var 底部说明栏: some View {
+        // 在 TextFiel Focused 的时候，也能触发这些 Button 的快捷键。
         HStack {
             Spacer()
-            Text("↑ ↓ 导航") +
-                Text("⏎ 使用") +
-                Text("⎋ 退出")
+            Button("↑ 上一个") { debugPrint("↑ 上一个")
+                self.searchBarFocus = false
+
+                let i: Int = self.selecting == nil ? 0 : self.selecting!.id - 1
+
+                if i < self.items.count && i >= 0 {
+                    let sdfasf = self.items[i]
+
+                    self.selecting = sdfasf
+                }
+            }
+            .keyboardShortcut(.upArrow, modifiers: [])
+
+            Button("↓ 下一个") { debugPrint("↓ 下一个")
+                self.searchBarFocus = false
+
+                let i: Int = self.selecting == nil ? 0 : self.selecting!.id + 1
+
+                if i < self.items.count {
+                    let sdfasf = self.items[i]
+
+                    self.selecting = sdfasf
+                }
+            }
+            .keyboardShortcut(.downArrow, modifiers: [])
+
+            Button("⏎ 使用") { debugPrint("⏎ 使用") }
+                .keyboardShortcut(.return, modifiers: [])
+
+            Button("⎋ 退出") { debugPrint("⎋ 退出") }
+                .keyboardShortcut(.escape, modifiers: [])
             Spacer()
         }
         .font(.footnote)
@@ -88,27 +139,20 @@ struct CommandPalace: View {
             .shadow(radius: 10)
     }
 
-    var Items: some View {
-        Group {
-            Group {
-                Text("Command 1")
-
-                Text("Command 1")
-                Text("Command 1")
-                Text("Command 1")
-            }
-
-            Group {
-                Text("Command 1")
-                Text("Command 1")
-                Text("Command 1")
-                Text("Command 1")
-            }
-            Group {
-                Text("Command 1")
-                Text("Command 1")
-                Text("Command 1")
-                Text("Command 1")
+    var ItemsView: some View {
+        // 使用 LazyVGrid 能优化内存。
+        LazyVGrid(columns: [GridItem()]) {
+            ForEach(self.items, id: \.self) { s in
+                HStack {
+                    Text(s.str)
+                    Spacer()
+                }
+                .background {
+                    self.selecting?.id == s.id ? Color.blue : Color.white.opacity(0.01)
+                }
+                .onTapGesture {
+                    self.selecting = s
+                }
             }
         }
     }
@@ -118,4 +162,9 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
+}
+
+struct hehe: Identifiable, Hashable {
+    let id: Int
+    let str: String
 }
