@@ -1,3 +1,3 @@
 演示:
 
-![images/gif.gif]
+![演示 gif](images/gif.gif)
