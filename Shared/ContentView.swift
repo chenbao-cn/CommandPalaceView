@@ -8,6 +8,14 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private
+    var text = ""
+
+    @State
+    var items: [hehe] = (0 ... 10000).map {
+        hehe(id: $0, str: "Command \($0)")
+    }
+
     var body: some View {
         ZStack {
             VStack {
@@ -19,22 +27,20 @@ struct ContentView: View {
             }
             .background(Color.red)
 
-            CommandPalace()
+            CommandPalace(text: $text, items: $items)
         }
     }
 }
 
 struct CommandPalace: View {
-    @State private
-    var text = ""
+    @Binding
+    var text: String
 
-    @FocusState
+    @Binding
+    var items: [hehe]
+
+    @FocusState private
     var searchBarFocus: Bool
-
-    @State private
-    var items: [hehe] = (0 ... 10000).map {
-        hehe(id: $0, str: "Command \($0)")
-    }
 
     @State private
     var selecting: hehe? = nil
@@ -140,6 +146,7 @@ struct CommandPalace: View {
         .lineLimit(1)
         .buttonStyle(LinkButtonStyle()) // 使用 LinkButtonStyle 就会非常快。
 //        .buttonStyle(DefaultButtonStyle()) // 在这里使用 DefaultButtonStyle 会有严重的性能问题。。。
+//        .buttonStyle(PlainButtonStyle()) // 使用 PlainButtonStyle 则不会触发 快捷键。。。。
     }
 
     var 圆角毛玻璃: some View {
@@ -154,9 +161,29 @@ struct CommandPalace: View {
             .shadow(radius: 10)
     }
 
+    var searching: [hehe] {
+        if text == "" {
+            return items
+        }
+
+        return items.filter({ (e: hehe) in
+
+            let arr = self.text.split(separator: " ")
+
+            for a in arr {
+                if e.str.contains(a) {
+                    return true
+                }
+            }
+
+            return false
+        }
+        )
+    }
+
     var ItemsView: some View {
         LazyVGrid(columns: [GridItem()]) {
-            ForEach(self.items) { s in
+            ForEach(searching) { s in
                 HStack {
                     Text(s.str)
                     Spacer()
@@ -180,12 +207,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-class hehe: Identifiable {
-    init(id: Int, str: String) {
-        self.id = id
-        self.str = str
-    }
-
+struct hehe: Identifiable {
     let id: Int
     let str: String
 }
