@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// new change from Xcode
 struct ContentView: View {
     var body: some View {
         ZStack {
@@ -33,12 +32,15 @@ struct CommandPalace: View {
     var searchBarFocus: Bool
 
     @State private
-    var items: [hehe] = (0 ... 1000).map {
+    var items: [hehe] = (0 ... 10000).map {
         hehe(id: $0, str: "Command \($0)")
     }
 
     @State private
     var selecting: hehe? = nil
+
+    @State private
+    var proxy: ScrollViewProxy? = nil
 
     var body: some View {
         HStack {
@@ -48,17 +50,19 @@ struct CommandPalace: View {
 //                        .textFieldStyle(RoundedBorderTextFieldStyle()) // 设置了 textFieldStyle 后，TextField 的字体就没法调整大小了。。。
                         .font(.largeTitle)
                         .focused($searchBarFocus)
-
                         .task {
                             searchBarFocus = true
                         }
 
                     // Items
-                    ScrollView(.vertical, showsIndicators: false) {
-                        ItemsView
-                            .lineLimit(1)
-                            .truncationMode(Text.TruncationMode.tail)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    ScrollViewReader.init { (p: ScrollViewProxy) in
+
+                        ScrollView(.vertical, showsIndicators: false) {
+                            ItemsView
+
+                        }.onAppear {
+                            self.proxy = p
+                        }
                     }
 
                     底部说明栏
@@ -92,28 +96,36 @@ struct CommandPalace: View {
         HStack {
             Spacer()
             Button("↑ 上一个") { debugPrint("↑ 上一个")
-                self.searchBarFocus = false
+                if self.searchBarFocus == true {
+                    self.searchBarFocus = false
+                }
 
                 let i: Int = self.selecting == nil ? 0 : self.selecting!.id - 1
 
                 if i < self.items.count && i >= 0 {
-                    let sdfasf = self.items[i]
-
-                    self.selecting = sdfasf
+                    self.selecting = self.items[i]
+                    proxy?.scrollTo(self.selecting?.id)
                 }
+
+                debugPrint("self.proxy == nil 么？ \(self.proxy == nil)")
             }
             .keyboardShortcut(.upArrow, modifiers: [])
 
             Button("↓ 下一个") { debugPrint("↓ 下一个")
-                self.searchBarFocus = false
+                print(Date().timeIntervalSinceReferenceDate) // 672740992.117567
+
+                if self.searchBarFocus == true {
+                    self.searchBarFocus = false
+                }
 
                 let i: Int = self.selecting == nil ? 0 : self.selecting!.id + 1
 
                 if i < self.items.count {
-                    let sdfasf = self.items[i]
-
-                    self.selecting = sdfasf
+                    self.selecting = self.items[i]
+                    proxy?.scrollTo(self.selecting?.id)
                 }
+
+                print(Date().timeIntervalSinceReferenceDate) // 672740992.135421
             }
             .keyboardShortcut(.downArrow, modifiers: [])
 
@@ -126,6 +138,8 @@ struct CommandPalace: View {
         }
         .font(.footnote)
         .lineLimit(1)
+        .buttonStyle(LinkButtonStyle()) // 使用 LinkButtonStyle 就会非常快。
+//        .buttonStyle(DefaultButtonStyle()) // 在这里使用 DefaultButtonStyle 会有严重的性能问题。。。
     }
 
     var 圆角毛玻璃: some View {
@@ -141,19 +155,20 @@ struct CommandPalace: View {
     }
 
     var ItemsView: some View {
-        // 使用 LazyVGrid 能优化内存。
         LazyVGrid(columns: [GridItem()]) {
-            ForEach(self.items, id: \.self) { s in
+            ForEach(self.items) { s in
                 HStack {
                     Text(s.str)
                     Spacer()
                 }
+                .lineLimit(1)
+                .truncationMode(Text.TruncationMode.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background {
                     self.selecting?.id == s.id ? Color.blue : Color.white.opacity(0.01)
                 }
-                .onTapGesture {
-                    self.selecting = s
-                }
+                .onTapGesture { self.selecting = s }
+                .id(s.id)
             }
         }
     }
@@ -165,7 +180,12 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-struct hehe: Identifiable, Hashable {
+class hehe: Identifiable {
+    init(id: Int, str: String) {
+        self.id = id
+        self.str = str
+    }
+
     let id: Int
     let str: String
 }
