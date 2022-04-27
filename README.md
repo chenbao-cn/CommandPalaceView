@@ -3,8 +3,3 @@
 ![演示 gif](images/gif.gif)
 
 
-some new change
-then push
-
-some change
-push from xcode
