@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// new change from Xcode
 struct ContentView: View {
     var body: some View {
         ZStack {
