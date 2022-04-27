@@ -16,6 +16,9 @@ struct ContentView: View {
         hehe(id: $0, str: "Command \($0)")
     }
 
+    @State
+    var isPresent: Bool = true
+
     var body: some View {
         ZStack {
             VStack {
@@ -27,8 +30,16 @@ struct ContentView: View {
             }
             .background(Color.red)
 
-            CommandPalace(text: $text, items: $items)
-        }
+            if isPresent {
+                CommandPalace(text: $text,
+                              items: $items,
+                              isPresent: $isPresent,
+                              onEnter: { (h: hehe?) in
+                                  debugPrint("onEnter, hehe.str is \(h?.str)")
+                              }
+                )
+            }
+        }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -38,6 +49,11 @@ struct CommandPalace: View {
 
     @Binding
     var items: [hehe]
+
+    @Binding
+    var isPresent: Bool
+
+    let onEnter: (hehe?) -> Void
 
     @FocusState private
     var searchBarFocus: Bool
@@ -102,44 +118,64 @@ struct CommandPalace: View {
         HStack {
             Spacer()
             Button("↑ 上一个") { debugPrint("↑ 上一个")
+
                 if self.searchBarFocus == true {
                     self.searchBarFocus = false
                 }
 
-                let i: Int = self.selecting == nil ? 0 : self.selecting!.id - 1
+                let sear = self.searching
+
+                let i: Int = { () -> Int in
+                    if self.selecting == nil {
+                        return 0
+                    } else if let index = sear.firstIndex(of: self.selecting!) {
+                        return index - 1
+                    }
+                    return 0
+                }()
 
                 if i < self.items.count && i >= 0 {
-                    self.selecting = self.items[i]
-                    proxy?.scrollTo(self.selecting?.id)
+                    self.selecting = sear[i]
+                    proxy?.scrollTo(self.selecting?.str)
                 }
-
-                debugPrint("self.proxy == nil 么？ \(self.proxy == nil)")
             }
             .keyboardShortcut(.upArrow, modifiers: [])
 
-            Button("↓ 下一个") { debugPrint("↓ 下一个")
-                print(Date().timeIntervalSinceReferenceDate) // 672740992.117567
+            Button("↓ 下一个") {
+                debugPrint("↓ 下一个")
 
                 if self.searchBarFocus == true {
                     self.searchBarFocus = false
                 }
+                let sear = self.searching
 
-                let i: Int = self.selecting == nil ? 0 : self.selecting!.id + 1
+                let i: Int = { () -> Int in
+                    if self.selecting == nil {
+                        return 0
+                    } else if let index = sear.firstIndex(of: self.selecting!) {
+                        return index + 1
+                    }
+                    return 0
+                }()
 
-                if i < self.items.count {
-                    self.selecting = self.items[i]
-                    proxy?.scrollTo(self.selecting?.id)
+                if i < sear.count {
+                    self.selecting = sear[i]
+                    proxy?.scrollTo(self.selecting?.str)
                 }
-
-                print(Date().timeIntervalSinceReferenceDate) // 672740992.135421
             }
             .keyboardShortcut(.downArrow, modifiers: [])
 
-            Button("⏎ 使用") { debugPrint("⏎ 使用") }
-                .keyboardShortcut(.return, modifiers: [])
+            Button("⏎ 使用") { debugPrint("⏎ 使用")
 
-            Button("⎋ 退出") { debugPrint("⎋ 退出") }
-                .keyboardShortcut(.escape, modifiers: [])
+                self.onEnter(self.selecting)
+            }
+            .keyboardShortcut(.return, modifiers: [])
+
+            Button("⎋ 退出") {
+                debugPrint("⎋ 退出")
+                isPresent.toggle()
+            }
+            .keyboardShortcut(.escape, modifiers: [])
             Spacer()
         }
         .font(.footnote)
@@ -192,10 +228,10 @@ struct CommandPalace: View {
                 .truncationMode(Text.TruncationMode.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background {
-                    self.selecting?.id == s.id ? Color.blue : Color.white.opacity(0.01)
+                    self.selecting?.str == s.str ? Color.blue : Color.white.opacity(0.01)
                 }
                 .onTapGesture { self.selecting = s }
-                .id(s.id)
+                .id(s.str)
             }
         }
     }
@@ -207,7 +243,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-struct hehe: Identifiable {
+struct hehe: Identifiable, Hashable {
     let id: Int
     let str: String
 }
